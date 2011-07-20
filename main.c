@@ -10,13 +10,14 @@
 void setup_rendering() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    //glFrustum(2, 2, 2, 0, 200, 0);
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
+    //glFrustum(2, 2, 2, 0, 200, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glRotatef(90, -1,0,0);
-    glScalef(0.3, 0.3, 0.3);
+    glRotatef(80, 1,0,0);
+    glScalef(0.1, 0.1, 0.1);
     glPolygonMode(GL_BACK,GL_LINE);
+    glViewport(0, 0, 600, 600);
 }
 
 void change_projection() {
@@ -46,7 +47,7 @@ int setup_sdl() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4); // antialiasing
-    SDL_Surface *surface = SDL_SetVideoMode(400, 400, 32, SDL_OPENGL);
+    SDL_Surface *surface = SDL_SetVideoMode(600, 600, 32, SDL_OPENGL);
     if (surface == NULL) {
         fprintf(stderr, "Failed to initialize OpenGL: %s\n", SDL_GetError());
         return 1;
@@ -70,12 +71,13 @@ int main(void){
     buffer_t buffer = create_vbo();
     while(1) {
         change_projection();
-        draw_objects(simulation, buffer);
+        draw_objects(&simulation, buffer);
+        run_simulation(&simulation);
         SDL_GL_SwapBuffers();
         SDL_Delay(50);
         if(handle_events() == 1) {
             destroy_vbo(buffer);
-            destroy_simulation(simulation);
+            destroy_simulation(&simulation);
             SDL_Quit();
             exit(0);
         }
