@@ -47,7 +47,7 @@ int setup_sdl() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4); // antialiasing
-    SDL_Surface *surface = SDL_SetVideoMode(600, 600, 32, SDL_OPENGL);
+    SDL_Surface *surface = SDL_SetVideoMode(600, 600, 24, SDL_OPENGL);
     if (surface == NULL) {
         fprintf(stderr, "Failed to initialize OpenGL: %s\n", SDL_GetError());
         return 1;
