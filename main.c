@@ -45,8 +45,8 @@ int setup_sdl() {
     SDL_WM_SetCaption("Orbits 3D", "Orbits 3D");
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4); // antialiasing
-    SDL_Surface *surface = SDL_SetVideoMode(400, 400, 32, SDL_OPENGL);
+    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4); // antialiasing
+    SDL_Surface *surface = SDL_SetVideoMode(400, 400, 24, SDL_OPENGL);
     if (surface == NULL) {
         fprintf(stderr, "Failed to initialize OpenGL: %s\n", SDL_GetError());
         return 1;
@@ -58,6 +58,14 @@ int setup_sdl() {
           fprintf(stderr, "Failed to initialize GLEW: %s\n", glewGetErrorString(err));
           return 1;
     }
+    printf("glDrawElements: %p\n", glDrawElements);
+    printf("glDrawArrays: %p\n", glDrawArrays);
+    printf("glGenBuffersARB: %p\n", glGenBuffersARB);
+    printf("glBindBufferARB: %p\n", glBindBufferARB);
+    printf("glBufferDataARB: %p\n", glBufferDataARB);
+    printf("glEnableVertexAttribArrayARB: %p\n", glEnableVertexAttribArrayARB);
+    printf("glVertexAttribPointerARB: %p\n", glVertexAttribPointerARB);
+    printf("glDeleteBuffersARB: %p\n", glDeleteBuffersARB);
     return 0;
 }
 
