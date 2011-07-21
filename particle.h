@@ -19,26 +19,22 @@
 #ifndef PARTICLE_H_
 #define PARTICLE_H_
 
-#include <math.h>
+#include <time.h>
 
 #include "vertex_buffer.h"
+#include "physic_engine.h"
 
 typedef struct{
-    float x,y,z;
-    float vx, vy, vz;
-    float r,g,b;
-    float radius;
-    float mass;
-} particle_t;
-
-typedef struct{
-    particle_t *particles;
+    particle_t *src_buf;
+    particle_t *dst_buf;
     unsigned long count;
-    int dt;
+    float dt;
 } simulation_t;
 
 simulation_t create_simulation();
-void destroy_simulation(simulation_t simulation);
-void fill_simulation(simulation_t simulation);
-void draw_objects(simulation_t simulation, buffer_t buffer);
+void destroy_simulation(simulation_t *simulation);
+void fill_simulation(simulation_t *simulation);
+void run_simulation(simulation_t *simulation);
+void draw_objects(simulation_t *simulation, buffer_t buffer);
+
 #endif

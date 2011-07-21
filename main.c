@@ -10,13 +10,14 @@
 void setup_rendering() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    //glFrustum(2, 2, 2, 0, 200, 0);
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
+    //glFrustum(2, 2, 2, 0, 200, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glRotatef(90, -1,0,0);
-    glScalef(0.3, 0.3, 0.3);
+    glRotatef(80, 1,0,0);
+    glScalef(0.1, 0.1, 0.1);
     glPolygonMode(GL_BACK,GL_LINE);
+    glViewport(0, 0, 600, 600);
 }
 
 void change_projection() {
@@ -78,12 +79,13 @@ int main(void){
     buffer_t buffer = create_vbo();
     while(1) {
         change_projection();
-        draw_objects(simulation, buffer);
+        draw_objects(&simulation, buffer);
+        run_simulation(&simulation);
         SDL_GL_SwapBuffers();
         SDL_Delay(50);
         if(handle_events() == 1) {
             destroy_vbo(buffer);
-            destroy_simulation(simulation);
+            destroy_simulation(&simulation);
             SDL_Quit();
             exit(0);
         }
