@@ -20,9 +20,11 @@
 
 buffer_t create_vbo() {
     buffer_t buffer;
-    unsigned int xrange = 10;
-    unsigned int yrange = 10;
-    unsigned int index_count = 2 * (xrange + 1) + 2 * (xrange + 1) * (yrange - 1);
+    unsigned int xrange = 20;
+    unsigned int yrange = 20;
+    unsigned int index = 0;
+    unsigned int offset = xrange + 2; // length of one triangle fan
+    unsigned int index_count = 2 * offset + 2 * (xrange + 1) * (yrange - 1);
     unsigned int vertex_count = xrange * yrange + 2;
     unsigned short *indices = malloc(sizeof(unsigned short) * index_count);
     GLfloat *vertices = malloc(sizeof(GLfloat) * 3 * vertex_count);
@@ -32,9 +34,9 @@ buffer_t create_vbo() {
     vertices[3] = 0;
     vertices[4] = 0;
     vertices[5] = -1;
-    unsigned int index = 6;
+    index = 6;
     for (unsigned int y = 0; y < yrange; y++) {
-        float theta = M_PI * (float)y / yrange;
+        float theta = M_PI * (float)(y+1) / (yrange+1);
         for (unsigned int x = 0; x < xrange; x++) {
             float phi = 2 * M_PI * (float)x / xrange;
             //polar coordinates
@@ -45,22 +47,27 @@ buffer_t create_vbo() {
         }
     }
     indices[0] = 0;
-    indices[xrange+1] = 1;
+    indices[offset] = 1;
+    index = 1;
     for (unsigned int i = 0; i < xrange; i++) {
-        indices[i + 1] = i + 2;
-        indices[i + 2 + xrange] = i + 2 + (yrange-1) * xrange;
+        indices[index] = i + 2;
+        indices[index + offset] = xrange + 1 - i + (yrange-1) * xrange;
+        index++;
     }
-    index = 2 * (xrange + 1) + 2;
-    for (unsigned int i = 0; i < 2 * (xrange+1); i++) {
-        printf("i=%d; indices[i]=%d\n", i, indices[i]);
-    }
-    /*for (unsigned int y = 0; y < (yrange - 1); y++) {
-        for (unsigned int x = 0; x < (xrange + 1); x++) {
-            indices[index] = (y * (xrange+1)) + x;
-            indices[index + 1] = ((1+y) * (xrange+1)) + x;
+    indices[index] = 2;
+    indices[index + offset] = xrange + 1 + (yrange-1) * xrange;
+
+    index = 2 * offset;
+    for (unsigned int y = 0; y < (yrange - 1); y++) {
+        for (unsigned int x = 0; x < xrange; x++) {
+            indices[index] = (y * xrange) + x + 2;
+            indices[index + 1] = ((1+y) * xrange) + x + 2;
             index += 2;
         }
-    }*/
+        indices[index] = y * xrange + 2;
+        indices[index + 1] = (y+1) * xrange + 2;
+        index += 2;
+    }
     buffer.indices = indices;
     buffer.vertices = vertices;
     buffer.xrange = xrange;
@@ -82,10 +89,15 @@ buffer_t create_vbo() {
 }
 
 void draw_vbo(buffer_t buffer) {
+    unsigned int fan_length = buffer.xrange + 2;
+    unsigned int strip_length = 2 * (buffer.xrange + 1);
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex_vboid);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.index_vboid);
-    glDrawElements(GL_LINE_STRIP, buffer.xrange + 1, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
-    glDrawElements(GL_TRIANGLE_FAN, buffer.xrange + 1, GL_UNSIGNED_SHORT, BUFFER_OFFSET(2 * (buffer.xrange + 1)));
+    glDrawElements(GL_TRIANGLE_FAN, fan_length, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+    glDrawElements(GL_TRIANGLE_FAN, fan_length, GL_UNSIGNED_SHORT, BUFFER_OFFSET(fan_length));
+    for (unsigned int i = 0; i < (buffer.yrange-1); i++) {
+        glDrawElements(GL_TRIANGLE_STRIP, strip_length, GL_UNSIGNED_SHORT, BUFFER_OFFSET(i * strip_length + 2 * fan_length));
+    }
 }
 
 void destroy_vbo(buffer_t buffer) {

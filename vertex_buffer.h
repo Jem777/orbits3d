@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define BUFFER_OFFSET(i) ((char *)NULL + 2 * (i))
 
 typedef struct {
     GLfloat *vertices;
