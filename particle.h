@@ -35,6 +35,6 @@ simulation_t *create_simulation();
 void destroy_simulation(simulation_t *simulation);
 void fill_simulation(simulation_t *simulation);
 void run_simulation(simulation_t *simulation);
-void draw_objects(simulation_t *simulation, buffer_t buffer);
+void draw_objects(simulation_t *simulation, buffer_t *buffer);
 
 #endif

@@ -18,8 +18,9 @@
 
 #include "vertex_buffer.h"
 
-buffer_t create_vbo() {
-    buffer_t buffer;
+buffer_t *create_vbo() {
+    buffer_t *buffer = malloc(sizeof(buffer_t));
+
     unsigned int xrange = 20;
     unsigned int yrange = 20;
     unsigned int index = 0;
@@ -28,6 +29,10 @@ buffer_t create_vbo() {
     unsigned int vertex_count = xrange * yrange + 2;
     unsigned short *indices = malloc(sizeof(unsigned short) * index_count);
     GLfloat *vertices = malloc(sizeof(GLfloat) * 3 * vertex_count);
+    if (buffer == NULL || indices == NULL || vertices == NULL) {
+        return NULL;
+    }
+
     vertices[0] = 0;
     vertices[1] = 0;
     vertices[2] = 1;
@@ -68,46 +73,50 @@ buffer_t create_vbo() {
         indices[index + 1] = (y+1) * xrange + 2;
         index += 2;
     }
-    buffer.indices = indices;
-    buffer.vertices = vertices;
-    buffer.xrange = xrange;
-    buffer.yrange = yrange;
 
-    glGenBuffers(1, &buffer.vertex_vboid);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex_vboid);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * vertex_count, &buffer.vertices[0], GL_STATIC_DRAW);
+    buffer->indices = indices;
+    buffer->vertices = vertices;
+    buffer->xrange = xrange;
+    buffer->yrange = yrange;
 
-    glGenBuffers(1, &buffer.index_vboid);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.index_vboid);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * index_count, buffer.indices, GL_STATIC_DRAW);
+    glGenBuffers(1, &buffer->vertex_vboid);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_vboid);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * vertex_count, &buffer->vertices[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex_vboid);
+    glGenBuffers(1, &buffer->index_vboid);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->index_vboid);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * index_count, buffer->indices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_vboid);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);   //The starting point of the VBO, for the vertices
 
     return buffer;
 }
 
-void draw_vbo(buffer_t buffer) {
-    unsigned int fan_length = buffer.xrange + 2;
-    unsigned int strip_length = 2 * (buffer.xrange + 1);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex_vboid);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.index_vboid);
+void draw_vbo(buffer_t *buffer) {
+    unsigned int fan_length = buffer->xrange + 2;
+    unsigned int strip_length = 2 * (buffer->xrange + 1);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_vboid);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->index_vboid);
     glDrawElements(GL_TRIANGLE_FAN, fan_length, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
     glDrawElements(GL_TRIANGLE_FAN, fan_length, GL_UNSIGNED_SHORT, BUFFER_OFFSET(fan_length));
-    for (unsigned int i = 0; i < (buffer.yrange-1); i++) {
+    for (unsigned int i = 0; i < (buffer->yrange-1); i++) {
         glDrawElements(GL_TRIANGLE_STRIP, strip_length, GL_UNSIGNED_SHORT, BUFFER_OFFSET(i * strip_length + 2 * fan_length));
     }
 }
 
-void destroy_vbo(buffer_t buffer) {
+void destroy_vbo(buffer_t *buffer) {
     glDisableVertexAttribArray(0);
-    glDeleteBuffers(1, &buffer.vertex_vboid);
-    glDeleteBuffers(1, &buffer.index_vboid);
+    glDeleteBuffers(1, &buffer->vertex_vboid);
+    glDeleteBuffers(1, &buffer->index_vboid);
     //glDeleteVertexArrays(1, &vao);
+    free(buffer->vertices);
+    free(buffer->indices);
+    free(buffer);
 }
 
-void draw_vbo_raw(buffer_t buffer) {
-    glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex_vboid);
-    glDrawArrays(GL_POINTS, 0, buffer.xrange * buffer.yrange + 2);
+void draw_vbo_raw(buffer_t *buffer) {
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_vboid);
+    glDrawArrays(GL_POINTS, 0, buffer->xrange * buffer->yrange + 2);
 }

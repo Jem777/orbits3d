@@ -73,7 +73,7 @@ int main(void){
     }
     setup_rendering();
     simulation_t *simulation = create_simulation();
-    buffer_t buffer = create_vbo();
+    buffer_t *buffer = create_vbo();
     shader_t *shader = create_shaders();
     while(1) {
         change_projection();

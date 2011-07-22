@@ -30,15 +30,14 @@
 typedef struct {
     GLfloat *vertices;
     unsigned short *indices;
-    unsigned short length;
     unsigned int xrange;
     unsigned int yrange;
     GLuint vertex_vboid;
     GLuint index_vboid;
 } buffer_t;
 
-buffer_t create_vbo();
-void destroy_vbo(buffer_t);
-void draw_vbo(buffer_t);
-void draw_vbo_raw(buffer_t buffer);
+buffer_t *create_vbo();
+void destroy_vbo(buffer_t *buffer);
+void draw_vbo(buffer_t *buffer);
+void draw_vbo_raw(buffer_t *buffer);
 #endif

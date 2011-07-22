@@ -91,7 +91,7 @@ void integrate(particle_t *src, particle_t *dst, vec3f acceleration, float dt){
     dst->position = vec_add(src->position, vec_scale(dst->velocity, dt));
 }
 
-void draw_objects(simulation_t *simulation, buffer_t buffer) {
+void draw_objects(simulation_t *simulation, buffer_t *buffer) {
     glMatrixMode(GL_MODELVIEW);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     for (unsigned int i = 0; i < simulation->count; i++) {
