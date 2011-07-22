@@ -19,7 +19,7 @@
 #include "physic_engine.h"
 
 vec3f calc_force(particle_t *a, particle_t *b) {
-    float grav_const = 0.001;
+    float grav_const = 0.01;
     vec3f force = vec_subtract(b->position, a->position);
     float square_r = vec_square(force);
     // Force = gamma * m1 * m2 / r^2
