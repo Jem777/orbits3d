@@ -20,7 +20,6 @@
 #define VERTEX_BUFFER_H_
 
 #include <GL/glew.h>
-#include <GL/gl.h>
 
 #include <math.h>
 #include <stdio.h>

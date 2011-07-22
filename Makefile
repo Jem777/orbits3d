@@ -28,7 +28,7 @@ clean:
 CLANG := clang
 CLANGFLAGS := -std=c99 -march=$(CPU_ARCHITECTURE) -O2
 clang: clean analyze
-	@$(CLANG) $(CLANGFLAGS) $(INCLUDEFLAGS) *.c $(INTFILE) -o engine
+	@$(CLANG) $(CLANGFLAGS) $(INCLUDEFLAGS) *.c $(INTFILE) -o $(BINNAME)
 analyze:
 	@$(CLANG) $(CLANGFLAGS) $(INCLUDECFLAGS) --analyze *.c $(INTFILE)
 

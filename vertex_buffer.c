@@ -101,8 +101,10 @@ void draw_vbo(buffer_t buffer) {
 }
 
 void destroy_vbo(buffer_t buffer) {
+    glDisableVertexAttribArray(0);
     glDeleteBuffers(1, &buffer.vertex_vboid);
     glDeleteBuffers(1, &buffer.index_vboid);
+    //glDeleteVertexArrays(1, &vao);
 }
 
 void draw_vbo_raw(buffer_t buffer) {
