@@ -37,68 +37,49 @@ char* filetobuf(char *file) {
     return buf; /* Return the buffer */
 }
 
+GLuint init_shader(const GLchar **source, GLint shader_type) {
+    char *info_log;
+    int max_length;
+    GLint is_compiled;
+    GLuint shader;
+
+    shader = glCreateShader(shader_type);
+    glShaderSource(shader, 1, source, 0);
+    glCompileShader(shader);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &is_compiled);
+    if(is_compiled == GL_FALSE) {
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &max_length);
+        /* The maxLength includes the NULL character */
+        info_log = (char *)malloc(max_length);
+        glGetShaderInfoLog(shader, max_length, &max_length, info_log);
+        /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
+        if (shader_type == GL_VERTEX_SHADER) {
+            printf("Compiling Vertex-Shader failed: \n%s\n", info_log);
+        } else if (shader_type == GL_GEOMETRY_SHADER) {
+            printf("Compiling Geometry-Shader failed: \n%s\n", info_log);
+        } else if (shader_type == GL_FRAGMENT_SHADER) {
+            printf("Compiling Fragment-Shader failed: \n%s\n", info_log);
+        }
+        free(info_log);
+        exit(1);
+    }
+    return shader;
+}
+
 shader_t *create_shaders() {
-    int IsCompiled_VS, IsCompiled_FS;
     int IsLinked;
     int maxLength;
-    char *vertexInfoLog;
-    char *fragmentInfoLog;
     char *shaderProgramInfoLog;
  
     // create a shader struct
     shader_t *shader = malloc(sizeof(shader_t));
 
-    /* Read our shaders into the appropriate buffers */
+    // Read our shaders into the appropriate buffers
     shader->vertexsource = filetobuf("Vertex.vs");
     shader->fragmentsource = filetobuf("Fragment.fs");
  
-    /* Create an empty vertex shader handle */
-    shader->vertex = glCreateShader(GL_VERTEX_SHADER);
- 
-    /* Send the vertex shader source code to GL */
-    /* Note that the source code is NULL character terminated. */
-    /* GL will automatically detect that therefore the length info can be 0 in this case (the last parameter) */
-    glShaderSource(shader->vertex, 1, (const GLchar**)&shader->vertexsource, 0);
- 
-    /* Compile the vertex shader */
-    glCompileShader(shader->vertex);
- 
-    glGetShaderiv(shader->vertex, GL_COMPILE_STATUS, &IsCompiled_VS);
-    if(!IsCompiled_VS) {
-        glGetShaderiv(shader->vertex, GL_INFO_LOG_LENGTH, &maxLength);
-        /* The maxLength includes the NULL character */
-        vertexInfoLog = (char *)malloc(maxLength);
-        glGetShaderInfoLog(shader->vertex, maxLength, &maxLength, vertexInfoLog);
-        /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
-        printf("Compiling VS failed: \n%s\n", vertexInfoLog);
-        /* In this simple program, we'll just leave */
-        free(vertexInfoLog);
-        exit(1);
-    }
- 
-    /* Create an empty fragment shader handle */
-    shader->fragment = glCreateShader(GL_FRAGMENT_SHADER);
- 
-    /* Send the fragment shader source code to GL */
-    /* Note that the source code is NULL character terminated. */
-    /* GL will automatically detect that therefore the length info can be 0 in this case (the last parameter) */
-    glShaderSource(shader->fragment, 1, (const GLchar**)&shader->fragmentsource, 0);
- 
-    /* Compile the fragment shader */
-    glCompileShader(shader->fragment);
- 
-    glGetShaderiv(shader->fragment, GL_COMPILE_STATUS, &IsCompiled_FS);
-    if(!IsCompiled_FS) {
-        glGetShaderiv(shader->fragment, GL_INFO_LOG_LENGTH, &maxLength);
-        /* The maxLength includes the NULL character */
-        fragmentInfoLog = (char *)malloc(maxLength);
-        glGetShaderInfoLog(shader->fragment, maxLength, &maxLength, fragmentInfoLog);
-        /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
-        printf("Compiling FS failed: %s\n", fragmentInfoLog);
-        /* In this simple program, we'll just leave */
-        free(fragmentInfoLog);
-        exit(1);
-    }
+    shader->vertex = init_shader((const GLchar**)&shader->vertexsource, GL_VERTEX_SHADER);
+    shader->fragment = init_shader((const GLchar**)&shader->fragmentsource, GL_FRAGMENT_SHADER);
  
     /* If we reached this point it means the vertex and fragment shaders compiled and are syntax error free. */
     /* We must link them together to make a GL shader program */
@@ -134,7 +115,6 @@ shader_t *create_shaders() {
         glGetProgramInfoLog(shader->program, maxLength, &maxLength, shaderProgramInfoLog);
         /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
         printf("Linking shaders failed: \n%s\n", shaderProgramInfoLog);
-        /* In this simple program, we'll just leave */
         free(shaderProgramInfoLog);
         exit(1);
     }
