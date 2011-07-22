@@ -72,19 +72,19 @@ int main(void){
         return 1;
     }
     setup_rendering();
-    simulation_t simulation = create_simulation();
+    simulation_t *simulation = create_simulation();
     buffer_t buffer = create_vbo();
     shader_t *shader = create_shaders();
     while(1) {
         change_projection();
-        draw_objects(&simulation, buffer);
-        run_simulation(&simulation);
+        draw_objects(simulation, buffer);
+        run_simulation(simulation);
         SDL_GL_SwapBuffers();
         SDL_Delay(50);
         if(handle_events() == 1) {
             destroy_shaders(shader);
             destroy_vbo(buffer);
-            destroy_simulation(&simulation);
+            destroy_simulation(simulation);
             SDL_Quit();
             exit(0);
         }

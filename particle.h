@@ -31,7 +31,7 @@ typedef struct{
     float dt;
 } simulation_t;
 
-simulation_t create_simulation();
+simulation_t *create_simulation();
 void destroy_simulation(simulation_t *simulation);
 void fill_simulation(simulation_t *simulation);
 void run_simulation(simulation_t *simulation);

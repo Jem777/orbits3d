@@ -21,13 +21,13 @@
 void debug_particle(particle_t particle);
 void integrate(particle_t* src, particle_t* dst, vec3f acceleration, float dt);
 
-simulation_t create_simulation() {
-    simulation_t simulation;
-    simulation.count = 10;
-    simulation.src_buf = malloc(sizeof(particle_t) * simulation.count);
-    simulation.dst_buf = malloc(sizeof(particle_t) * simulation.count);
-    simulation.dt = 0.01;
-    fill_simulation(&simulation);
+simulation_t *create_simulation() {
+    simulation_t *simulation = malloc(sizeof(simulation_t));
+    simulation->count = 10;
+    simulation->src_buf = malloc(sizeof(particle_t) * simulation->count);
+    simulation->dst_buf = malloc(sizeof(particle_t) * simulation->count);
+    simulation->dt = 0.01;
+    fill_simulation(simulation);
     return simulation;
 }
 
