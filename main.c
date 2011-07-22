@@ -14,15 +14,18 @@ void setup_rendering() {
     glLoadIdentity();
     //glFrustum(2, 2, 2, 0, 200, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glRotatef(80, 1,0,0);
-    glScalef(0.1, 0.1, 0.1);
+    //glRotatef(90, 1,0,0);
+    //glRotatef(10, 1,0,0);
+    glScalef(0.3, 0.3, 0.3);
     glPolygonMode(GL_BACK,GL_LINE);
+    //glShadeModel(GL_SMOOTH);
     glViewport(0, 0, 600, 600);
 }
 
 void change_projection() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);
-    glRotatef(1, 0,0,1);
+    glRotatef(1, 0,1,0);
 }
 
 int handle_events() {
@@ -47,7 +50,7 @@ int setup_sdl() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4); // antialiasing
-    SDL_Surface *surface = SDL_SetVideoMode(400, 400, 24, SDL_OPENGL);
+    SDL_Surface *surface = SDL_SetVideoMode(600, 600, 24, SDL_OPENGL);
     if (surface == NULL) {
         fprintf(stderr, "Failed to initialize OpenGL: %s\n", SDL_GetError());
         return 1;
@@ -55,18 +58,13 @@ int setup_sdl() {
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {
-          /*  Problem: glewInit failed, something is seriously wrong. */
-          fprintf(stderr, "Failed to initialize GLEW: %s\n", glewGetErrorString(err));
-          return 1;
+        /*  Problem: glewInit failed, something is seriously wrong. */
+        fprintf(stderr, "Failed to initialize GLEW: %s\n", glewGetErrorString(err));
+        return 1;
     }
-    printf("glDrawElements: %p\n", glDrawElements);
-    printf("glDrawArrays: %p\n", glDrawArrays);
-    printf("glGenBuffersARB: %p\n", glGenBuffersARB);
-    printf("glBindBufferARB: %p\n", glBindBufferARB);
-    printf("glBufferDataARB: %p\n", glBufferDataARB);
-    printf("glEnableVertexAttribArrayARB: %p\n", glEnableVertexAttribArrayARB);
-    printf("glVertexAttribPointerARB: %p\n", glVertexAttribPointerARB);
-    printf("glDeleteBuffersARB: %p\n", glDeleteBuffersARB);
+    if (!GLEW_VERSION_2_0) {
+        fprintf(stderr, "OpenGL 2.0 or higher is needed for this application\n");
+    }
     return 0;
 }
 
@@ -79,8 +77,10 @@ int main(void){
     buffer_t buffer = create_vbo();
     while(1) {
         change_projection();
-        draw_objects(&simulation, buffer);
-        run_simulation(&simulation);
+        //draw_objects(&simulation, buffer);
+        //run_simulation(&simulation);
+        draw_vbo(buffer);
+        draw_vbo_raw(buffer);
         SDL_GL_SwapBuffers();
         SDL_Delay(50);
         if(handle_events() == 1) {

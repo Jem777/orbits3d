@@ -18,6 +18,8 @@ BINNAME := orbits3d
 
 default: clean analyze
 	@$(CC) $(CNFLAGS) $(INCLUDEFLAGS) *.c -o $(BINNAME)
+debug: clean analyze
+	@$(CC) $(CDFLAGS) $(INCLUDEFLAGS) *.c -o $(BINNAME)
 clean:
 	@$(RM) $(BINNAME)
 	@$(RM) *.plist
