@@ -23,7 +23,7 @@ void integrate(particle_t* src, particle_t* dst, vec3f acceleration, float dt);
 
 simulation_t *create_simulation() {
     simulation_t *simulation = malloc(sizeof(simulation_t));
-    simulation->count = 10;
+    simulation->count = 3;
     simulation->src_buf = malloc(sizeof(particle_t) * simulation->count);
     simulation->dst_buf = malloc(sizeof(particle_t) * simulation->count);
     simulation->dt = 0.01;
@@ -91,15 +91,14 @@ void integrate(particle_t *src, particle_t *dst, vec3f acceleration, float dt){
     dst->position = vec_add(src->position, vec_scale(dst->velocity, dt));
 }
 
-void draw_objects(simulation_t *simulation, buffer_t *buffer) {
-    glMatrixMode(GL_MODELVIEW);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void draw_objects(simulation_t *simulation, buffer_t *buffer, shader_t *shader, GLfloat modelview[16]) {
     for (unsigned int i = 0; i < simulation->count; i++) {
         particle_t particle = simulation->src_buf[i];
         vec3f p = particle.position;
-        glLoadIdentity();
-        glTranslatef(p.x, p.y, p.z);
-        glScalef(particle.radius/2, particle.radius/2, particle.radius/2);
+        load_identity(modelview);
+        translate(modelview, p.x, p.y, p.z);
+        scale(modelview, particle.radius, particle.radius, particle.radius);
+        set_matrix(shader, MODELVIEW_MATRIX, modelview);
         glColor3f(particle.r, particle.g, particle.b);
         draw_vbo(buffer);
     }

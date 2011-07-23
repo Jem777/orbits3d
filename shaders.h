@@ -19,8 +19,12 @@
 #ifndef SHADERS_H_
 #define SHADERS_H_
 
+#define PROJECTION_MATRIX "projectionMatrix"
+#define MODELVIEW_MATRIX "modelViewMatrix"
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <GL/glew.h>
 
 typedef struct{
@@ -32,5 +36,7 @@ typedef struct{
 char* filetobuf(char *file);
 shader_t *create_shaders();
 void destroy_shaders(shader_t *shader);
+void get_matrix(shader_t *shader, const char *matrix_type, GLfloat *matrix_object);
+void set_matrix(shader_t *shader, const char *matrix_type, GLfloat *matrix_object);
 
 #endif

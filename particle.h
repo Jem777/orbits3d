@@ -23,6 +23,8 @@
 
 #include "vertex_buffer.h"
 #include "physic_engine.h"
+#include "shaders.h"
+#include "matrix.h"
 
 typedef struct{
     particle_t *src_buf;
@@ -35,6 +37,6 @@ simulation_t *create_simulation();
 void destroy_simulation(simulation_t *simulation);
 void fill_simulation(simulation_t *simulation);
 void run_simulation(simulation_t *simulation);
-void draw_objects(simulation_t *simulation, buffer_t *buffer);
+void draw_objects(simulation_t *simulation, buffer_t *buffer, shader_t *shader, GLfloat modelview[16]);
 
 #endif

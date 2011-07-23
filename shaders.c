@@ -137,13 +137,13 @@ void destroy_shaders(shader_t *shader) {
     free(shader);
 }
 
-void get_matrix(shader_t *shader, const char *matrix_type) {
+void get_matrix(shader_t *shader, const char *matrix_type, GLfloat *matrix_object) {
     GLint matrix_location = glGetUniformLocation(shader->program, matrix_type);
-    asdf;
+    glGetUniformfv(shader->program, matrix_location, matrix_object);
 }
 
-void set_matrix(shader_t *shader, asdf) {
+void set_matrix(shader_t *shader, const char *matrix_type, GLfloat *matrix_object) {
     GLint matrix_location = glGetUniformLocation(shader->program, matrix_type);
-    glUniformMatrix4fv(g_modelViewLocation, 1, GL_FALSE, g_modelView);
-    asdf;
+    glUniformMatrix4fv(matrix_location, 1, GL_FALSE, matrix_object);
 }
+

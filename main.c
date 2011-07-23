@@ -6,25 +6,24 @@
 #include "shaders.h"
 #include "vertex_buffer.h"
 #include "particle.h"
+#include "matrix.h"
 
-void setup_rendering() {
+void setup_rendering(shader_t *shader, GLfloat projection[16]) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    //glFrustum(2, 2, 2, 0, 200, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glRotatef(80, 1,0,0);
-    glScalef(0.1, 0.1, 0.1);
+    load_identity(projection);
+    rotate(projection, 80, 1,0,0);
+    scale(projection, 0.1, 0.1, 0.1);
+    set_matrix(shader, PROJECTION_MATRIX, projection);
     glPolygonMode(GL_BACK,GL_LINE);
-    //glShadeModel(GL_SMOOTH);
     glViewport(0, 0, 600, 600);
 }
 
-void change_projection() {
+void change_projection(shader_t *shader, GLfloat projection[16]) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_PROJECTION);
-    glRotatef(1, 0,0,1);
+    rotate(projection, 1, 0,0,1);
+    set_matrix(shader, PROJECTION_MATRIX, projection);
 }
 
 int handle_events() {
@@ -72,13 +71,15 @@ int main(void){
     if (setup_sdl() == 1) {
         return 1;
     }
-    setup_rendering();
+    GLfloat projection[16];
+    GLfloat modelview[16];
     simulation_t *simulation = create_simulation();
     buffer_t *buffer = create_vbo();
     shader_t *shader = create_shaders();
+    setup_rendering(shader, projection);
     while(1) {
-        change_projection();
-        draw_objects(simulation, buffer);
+        change_projection(shader, projection);
+        draw_objects(simulation, buffer, shader, modelview);
         run_simulation(simulation);
         SDL_GL_SwapBuffers();
         SDL_Delay(50);
