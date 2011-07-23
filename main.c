@@ -63,6 +63,7 @@ int setup_sdl() {
     }
     if (!GLEW_VERSION_2_0) {
         fprintf(stderr, "OpenGL 2.0 or higher is needed for this application\n");
+        return 1;
     }
     return 0;
 }
