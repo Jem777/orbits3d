@@ -29,10 +29,12 @@
 
 typedef struct {
     GLfloat *vertices;
+    GLfloat *normals;
     unsigned short *indices;
     unsigned int xrange;
     unsigned int yrange;
     GLuint vertex_vboid;
+    GLuint normal_vboid;
     GLuint index_vboid;
 } buffer_t;
 

@@ -29,16 +29,25 @@ buffer_t *create_vbo() {
     unsigned int vertex_count = xrange * yrange + 2;
     unsigned short *indices = malloc(sizeof(unsigned short) * index_count);
     GLfloat *vertices = malloc(sizeof(GLfloat) * 3 * vertex_count);
+    GLfloat *normals = malloc(sizeof(GLfloat) * 3 * vertex_count);
     if (buffer == NULL || indices == NULL || vertices == NULL) {
         return NULL;
     }
 
+    // vertices
     vertices[0] = 0;
     vertices[1] = 0;
     vertices[2] = 1;
     vertices[3] = 0;
     vertices[4] = 0;
     vertices[5] = -1;
+    // normal vectors (are the same)
+    normals[0] = 0;
+    normals[1] = 0;
+    normals[2] = 1;
+    normals[3] = 0;
+    normals[4] = 0;
+    normals[5] = -1;
     index = 6;
     for (unsigned int y = 0; y < yrange; y++) {
         float theta = M_PI * (float)(y+1) / (yrange+1);
@@ -48,6 +57,9 @@ buffer_t *create_vbo() {
             vertices[index] = sin(theta) * cos(phi);
             vertices[index+1] = sin(theta) * sin(phi);
             vertices[index+2] = cos(theta);
+            normals[index] = sin(theta) * cos(phi);
+            normals[index+1] = sin(theta) * sin(phi);
+            normals[index+2] = cos(theta);
             index += 3;
         }
     }
@@ -76,6 +88,7 @@ buffer_t *create_vbo() {
 
     buffer->indices = indices;
     buffer->vertices = vertices;
+    buffer->normals = normals;
     buffer->xrange = xrange;
     buffer->yrange = yrange;
 
@@ -87,9 +100,16 @@ buffer_t *create_vbo() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->index_vboid);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * index_count, buffer->indices, GL_STATIC_DRAW);
 
+    glGenBuffers(1, &buffer->normal_vboid);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->normal_vboid);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * vertex_count, &buffer->vertices[0], GL_STATIC_DRAW);
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_vboid);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);   //The starting point of the VBO, for the vertices
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->normal_vboid);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);   //The starting point of the VBO, for the vertices
 
     return buffer;
 }
@@ -112,6 +132,7 @@ void destroy_vbo(buffer_t *buffer) {
     glDeleteBuffers(1, &buffer->index_vboid);
     //glDeleteVertexArrays(1, &vao);
     free(buffer->vertices);
+    free(buffer->normals);
     free(buffer->indices);
     free(buffer);
 }

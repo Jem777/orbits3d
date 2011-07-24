@@ -60,14 +60,18 @@ void load_identity(GLfloat matrix[16]) {
 void multiply_matrix(GLfloat matrix[16], GLfloat matrix0[16], GLfloat matrix1[16]) {
     GLuint i;
     GLuint k;
+    GLuint l, m;
 
     GLfloat temp[16];
 
     for (i = 0; i < 16; i++) {
         temp[i] = 0.0f;
+        l = i % 4;
+        m = (i / 4) * 4;
         for (k = 0; k < 4; k++) {
-            //			  		row   column   		   row column
-            temp[i] += matrix0[(i % 4) + (k * 4)] * matrix1[(k) + ((i / 4) * 4)];
+            temp[i] += matrix0[l] * matrix1[m];
+            l += 4;
+            m++;
         }
     }
 
