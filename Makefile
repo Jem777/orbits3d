@@ -1,7 +1,7 @@
 CC := gcc
 
-INCLUDECFLAGS := `pkg-config --cflags sdl` `pkg-config --cflags gl` `pkg-config --cflags glew`
-INCLUDELIBFLAGS := -lm `pkg-config --libs sdl` `pkg-config --libs gl` `pkg-config --libs glew` -lSOIL -I"."
+INCLUDECFLAGS := `pkg-config --cflags sdl` `pkg-config --cflags glew`
+INCLUDELIBFLAGS := -lm `pkg-config --libs sdl` `pkg-config --libs glew` -lSOIL -I"."
 INCLUDEFLAGS := $(INCLUDECFLAGS) $(INCLUDELIBFLAGS)
 
 CPU_ARCHITECTURE := core2
