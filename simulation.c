@@ -20,7 +20,7 @@
 
 simulation_t *create_simulation() {
     simulation_t *simulation = malloc(sizeof(simulation_t));
-    simulation->count = 1000;
+    simulation->count = 100;
     simulation->src_buf = malloc(sizeof(particle_t) * simulation->count);
     simulation->dst_buf = malloc(sizeof(particle_t) * simulation->count);
     simulation->dt = 0.001;

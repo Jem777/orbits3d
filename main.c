@@ -11,11 +11,10 @@
 
 void setup_rendering(shader_t *shader, GLfloat camera[16], GLfloat projection[16]) {
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-    glEnable(GL_POLYGON_SMOOTH);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_CLAMP); // no clipping
     glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);
+    //glBlendFunc(GL_SRC_ALPHA,GL_ONE);
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -56,6 +55,7 @@ int setup_sdl() {
     SDL_WM_SetCaption("Orbits 3D", "Orbits 3D");
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1); // antialiasing
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4); // antialiasing
     SDL_Surface *surface = SDL_SetVideoMode(600, 600, 24, SDL_OPENGL);
     if (surface == NULL) {
@@ -86,7 +86,6 @@ int main(void){
     buffer_t *buffer = create_vbo();
     shader_t *shader = create_shaders();
     setup_rendering(shader, camera, projection);
-    init_textures();
     GLuint tex = load_texture("pixmaps/earthmap.jpg");
     set_texture(shader, tex);
     while(1) {

@@ -23,9 +23,9 @@
 
 #include <stdlib.h>
 #include <GL/glew.h>
-#include <IL/il.h>
+#include <SOIL/SOIL.h>
 
-void init_textures();
 GLuint load_texture(const char *path);
+void unload_texture(GLuint);
 
 #endif

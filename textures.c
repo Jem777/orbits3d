@@ -18,35 +18,8 @@
 
 #include "textures.h"
 
-void init_textures() {
-    ilInit();
-}
-
 GLuint load_texture(const char *path) {
-    ILuint texid;
-    ILboolean success;
-    GLuint image;
-    ilGenImages(1, &texid);
-    ilBindImage(texid);
-    success = ilLoadImage((const ILstring)path);
-    if (!success) {
-        printf("Couldn't load texture at %s\n", path);
-        exit(1);
-    }
-    success = ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-    if (!success) {
-        printf("Couldn't convert texture at %s to RGB, uByte\n", path);
-        exit(1);
-    }
-    glGenTextures(1, &image);
-    glBindTexture(GL_TEXTURE_2D, image);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
-            ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), 
-            GL_UNSIGNED_BYTE, ilGetData());
-    ilDeleteImages(1, &texid);
-    return image;
+    return SOIL_load_OGL_texture (path, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
 }
 
 void unload_texture(GLuint image) {
