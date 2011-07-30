@@ -18,23 +18,26 @@
 
 #include "shaders.h"
 
-char* filetobuf(char *file) {
-    FILE *fptr;
-    long length;
-    char *buf;
+char *filetobuf(char *fn) {
+    FILE *fp;
+    char *content = NULL;
+    int count=0;
  
-    fptr = fopen(file, "rb"); /* Open file for reading */
-    if (!fptr) /* Return NULL on failure */
-        return NULL;
-    fseek(fptr, 0, SEEK_END); /* Seek to the end of the file */
-    length = ftell(fptr); /* Find out how many bytes into the file we are */
-    buf = (char*)malloc(length+1); /* Allocate a buffer for the entire length of the file and a null terminator */
-    fseek(fptr, 0, SEEK_SET); /* Go back to the beginning of the file */
-    fread(buf, length, 1, fptr); /* Read the contents of the file in to the buffer */
-    fclose(fptr); /* Close the file */
-    buf[length] = 0; /* Null terminator */
- 
-    return buf; /* Return the buffer */
+    if (fn != NULL) {
+        fp = fopen(fn,"rt");
+        if (fp != NULL) {
+            fseek(fp, 0, SEEK_END);
+            count = ftell(fp);
+            rewind(fp);
+            if (count > 0) {
+                content = (char *)malloc(sizeof(char) * (count+1));
+                count = fread(content,sizeof(char),count,fp);
+                content[count] = '\0';
+            }
+            fclose(fp);
+        }
+    }
+    return content;
 }
 
 GLuint init_shader(const GLchar **source, GLint shader_type) {
@@ -76,25 +79,24 @@ shader_t *create_shaders() {
 
     // Read our shaders into the appropriate buffers
     shader->vertexsource = filetobuf("Vertex.vs");
+    //shader->geometrysource = filetobuf("Geometry.gs");
     shader->fragmentsource = filetobuf("Fragment.fs");
  
     shader->vertex = init_shader((const GLchar**)&shader->vertexsource, GL_VERTEX_SHADER);
+    //shader->geometry = init_shader((const GLchar**)&shader->geometrysource, GL_GEOMETRY_SHADER);
     shader->fragment = init_shader((const GLchar**)&shader->fragmentsource, GL_FRAGMENT_SHADER);
  
-    /* If we reached this point it means the vertex and fragment shaders compiled and are syntax error free. */
-    /* We must link them together to make a GL shader program */
-    /* GL shader programs are monolithic. It is a single piece made of 1 vertex shader and 1 fragment shader. */
-    /* Assign our program handle a "name" */
     shader->program = glCreateProgram();
  
     /* Attach our shaders to our program */
     glAttachShader(shader->program, shader->vertex);
+    //glAttachShader(shader->program, shader->geometry);
     glAttachShader(shader->program, shader->fragment);
  
-    /* Bind attribute index 0 (coordinates) to in_Position and attribute index 1 (color) to in_Color */
     /* Attribute locations must be setup before calling glLinkProgram. */
-    //glBindAttribLocation(shader->program, 0, "in_Position");
-    //glBindAttribLocation(shader->program, 1, "in_Color");
+    glBindAttribLocation(shader->program, 0, "vertex");
+    glBindAttribLocation(shader->program, 1, "normal");
+    glBindAttribLocation(shader->program, 2, "texCoord");
  
     /* Link our program */
     /* At this stage, the vertex and fragment programs are inspected, optimized and a binary code is generated for the shader. */
@@ -145,5 +147,10 @@ void get_matrix(shader_t *shader, const char *matrix_type, GLfloat *matrix_objec
 void set_matrix(shader_t *shader, const char *matrix_type, GLfloat *matrix_object) {
     GLint matrix_location = glGetUniformLocation(shader->program, matrix_type);
     glUniformMatrix4fv(matrix_location, 1, GL_FALSE, matrix_object);
+}
+
+void set_texture(shader_t *shader, GLuint texture) {
+    GLint texture_location = glGetUniformLocation(shader->program, "firstTexture");
+    glUniform1ui(texture_location, texture);
 }
 

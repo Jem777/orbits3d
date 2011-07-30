@@ -30,11 +30,13 @@
 typedef struct {
     GLfloat *vertices;
     GLfloat *normals;
+    GLfloat *tex_coords;
     unsigned short *indices;
     unsigned int xrange;
     unsigned int yrange;
     GLuint vertex_vboid;
     GLuint normal_vboid;
+    GLuint tex_coord_vboid;
     GLuint index_vboid;
 } buffer_t;
 

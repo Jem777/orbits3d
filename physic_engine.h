@@ -23,14 +23,7 @@
 #include <stdio.h>
 
 #include "vector.h"
-
-typedef struct{
-    vec3f position;
-    vec3f velocity;
-    float r,g,b;
-    float radius;
-    float mass;
-} particle_t;
+#include "particle.h"
 
 vec3f calc_force(particle_t *a, particle_t *b);
 int check_collision(particle_t *a, particle_t *b);

@@ -5,15 +5,16 @@ uniform mat4 modelViewMatrix;
 
 in vec4 vertex;
 in vec3 normal;
+in vec2 texCoord;
 
 out vec3 fragmentNormal;
-out vec3 fragmentEye;
+out vec2 fragmentTexCoord;
 
-void main(void) {
-    fragmentNormal = (modelViewMatrix*vec4(normal, 0)).xyz;
+void main(void)
+{
+    fragmentTexCoord = texCoord;
 
-    fragmentEye = (modelViewMatrix*vec4(normal, 0)).xyz;
-    fragmentEye = -normalize(fragmentEye);
+    fragmentNormal = (modelViewMatrix*vec4(normal, 1.0)).xyz;
 
     gl_Position = projectionMatrix*modelViewMatrix*vertex;
 }

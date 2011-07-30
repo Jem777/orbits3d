@@ -5,26 +5,34 @@
 
 #include "shaders.h"
 #include "vertex_buffer.h"
-#include "particle.h"
+#include "simulation.h"
 #include "matrix.h"
+#include "textures.h"
 
-void setup_rendering(shader_t *shader, GLfloat projection[16]) {
+void setup_rendering(shader_t *shader, GLfloat camera[16], GLfloat projection[16]) {
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_POLYGON_SMOOTH);
+    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_CLAMP); // no clipping
+    glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     load_identity(projection);
-    rotate(projection, 80, 1,0,0);
-    scale(projection, 0.1, 0.1, 0.1);
     set_matrix(shader, PROJECTION_MATRIX, projection);
+    load_identity(camera);
+    scale(camera, 0.2, 0.2, 0.2);
+    rotate(camera, 80, 1,0,0);
     glViewport(0, 0, 600, 600);
+    glPolygonMode(GL_BACK,GL_LINE);
 }
 
-void change_projection(shader_t *shader, GLfloat projection[16]) {
+void change_camera(GLfloat camera[16]) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    rotate(projection, 0.5, 0,0,1);
-    set_matrix(shader, PROJECTION_MATRIX, projection);
+    rotate(camera, 0.5, 0,0,1);
 }
 
 int handle_events() {
@@ -72,15 +80,18 @@ int main(void){
     if (setup_sdl() == 1) {
         return 1;
     }
+    GLfloat camera[16];
     GLfloat projection[16];
-    GLfloat modelview[16];
     simulation_t *simulation = create_simulation();
     buffer_t *buffer = create_vbo();
     shader_t *shader = create_shaders();
-    setup_rendering(shader, projection);
+    setup_rendering(shader, camera, projection);
+    init_textures();
+    GLuint tex = load_texture("pixmaps/earthmap.jpg");
+    set_texture(shader, tex);
     while(1) {
-        change_projection(shader, projection);
-        draw_objects(simulation, buffer, shader, modelview);
+        change_camera(camera);
+        draw_objects(simulation, buffer, shader, camera);
         run_simulation(simulation);
         SDL_GL_SwapBuffers();
         SDL_Delay(50);

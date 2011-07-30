@@ -28,8 +28,8 @@
 #include <GL/glew.h>
 
 typedef struct{
-    GLchar *vertexsource, *fragmentsource;
-    GLuint vertex, fragment;
+    GLchar *vertexsource, *geometrysource, *fragmentsource;
+    GLuint vertex, geometry, fragment;
     GLuint program;
 } shader_t;
 
@@ -38,5 +38,6 @@ shader_t *create_shaders();
 void destroy_shaders(shader_t *shader);
 void get_matrix(shader_t *shader, const char *matrix_type, GLfloat *matrix_object);
 void set_matrix(shader_t *shader, const char *matrix_type, GLfloat *matrix_object);
+void set_texture(shader_t *shader, GLuint texture);
 
 #endif

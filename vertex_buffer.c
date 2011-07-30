@@ -24,13 +24,15 @@ buffer_t *create_vbo() {
     unsigned int xrange = 20;
     unsigned int yrange = 20;
     unsigned int index = 0;
+    unsigned int tex_index = 0;
     unsigned int offset = xrange + 2; // length of one triangle fan
     unsigned int index_count = 2 * offset + 2 * (xrange + 1) * (yrange - 1);
     unsigned int vertex_count = xrange * yrange + 2;
     unsigned short *indices = malloc(sizeof(unsigned short) * index_count);
     GLfloat *vertices = malloc(sizeof(GLfloat) * 3 * vertex_count);
     GLfloat *normals = malloc(sizeof(GLfloat) * 3 * vertex_count);
-    if (buffer == NULL || indices == NULL || vertices == NULL) {
+    GLfloat *tex_coords = malloc(sizeof(GLfloat) * 2 * vertex_count);
+    if (buffer == NULL || indices == NULL || vertices == NULL || tex_coords == NULL) {
         return NULL;
     }
 
@@ -41,26 +43,33 @@ buffer_t *create_vbo() {
     vertices[3] = 0;
     vertices[4] = 0;
     vertices[5] = -1;
-    // normal vectors (are the same)
+    // normal vectors are the same, but without alpha
     normals[0] = 0;
     normals[1] = 0;
     normals[2] = 1;
     normals[3] = 0;
     normals[4] = 0;
     normals[5] = -1;
-    index = 6;
+    // texCoord
+    tex_coords[0] = 0.5;
+    tex_coords[1] = 0;
+    tex_coords[2] = 0.5;
+    tex_coords[3] = 1;
+    index = 2;
     for (unsigned int y = 0; y < yrange; y++) {
         float theta = M_PI * (float)(y+1) / (yrange+1);
         for (unsigned int x = 0; x < xrange; x++) {
             float phi = 2 * M_PI * (float)x / xrange;
             //polar coordinates
-            vertices[index] = sin(theta) * cos(phi);
-            vertices[index+1] = sin(theta) * sin(phi);
-            vertices[index+2] = cos(theta);
-            normals[index] = sin(theta) * cos(phi);
-            normals[index+1] = sin(theta) * sin(phi);
-            normals[index+2] = cos(theta);
-            index += 3;
+            vertices[index*3] = sin(theta) * cos(phi);
+            vertices[index*3+1] = sin(theta) * sin(phi);
+            vertices[index*3+2] = cos(theta);
+            normals[index*3] = sin(theta) * cos(phi);
+            normals[index*3+1] = sin(theta) * sin(phi);
+            normals[index*3+2] = cos(theta);
+            tex_coords[index*2] = (float)x / xrange;
+            tex_coords[index*2+1] = (float)(y+1) / (yrange+1);
+            index++;
         }
     }
     indices[0] = 0;
@@ -89,27 +98,35 @@ buffer_t *create_vbo() {
     buffer->indices = indices;
     buffer->vertices = vertices;
     buffer->normals = normals;
+    buffer->tex_coords = tex_coords;
     buffer->xrange = xrange;
     buffer->yrange = yrange;
-
-    glGenBuffers(1, &buffer->vertex_vboid);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_vboid);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * vertex_count, &buffer->vertices[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &buffer->index_vboid);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->index_vboid);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * index_count, buffer->indices, GL_STATIC_DRAW);
 
+    glGenBuffers(1, &buffer->vertex_vboid);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_vboid);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * vertex_count, &buffer->vertices[0], GL_STATIC_DRAW);
+
     glGenBuffers(1, &buffer->normal_vboid);
     glBindBuffer(GL_ARRAY_BUFFER, buffer->normal_vboid);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * vertex_count, &buffer->vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * vertex_count, &buffer->normals[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &buffer->tex_coord_vboid);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->tex_coord_vboid);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 2 * vertex_count, &buffer->tex_coords[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_vboid);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);   //The starting point of the VBO, for the vertices
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, buffer->normal_vboid);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);   //The starting point of the VBO, for the vertices
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->tex_coord_vboid);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     return buffer;
 }
@@ -128,11 +145,16 @@ void draw_vbo(buffer_t *buffer) {
 
 void destroy_vbo(buffer_t *buffer) {
     glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
     glDeleteBuffers(1, &buffer->vertex_vboid);
+    glDeleteBuffers(1, &buffer->normal_vboid);
+    glDeleteBuffers(1, &buffer->tex_coord_vboid);
     glDeleteBuffers(1, &buffer->index_vboid);
     //glDeleteVertexArrays(1, &vao);
     free(buffer->vertices);
     free(buffer->normals);
+    free(buffer->tex_coords);
     free(buffer->indices);
     free(buffer);
 }
